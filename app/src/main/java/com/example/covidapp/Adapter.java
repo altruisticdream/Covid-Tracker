@@ -84,6 +84,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         else
             m=4;
 
-
+        notifyDataSetChanged();
     }
 }
