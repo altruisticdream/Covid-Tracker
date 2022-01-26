@@ -1,14 +1,15 @@
 # COVID TRACKER APP
 
-It is an android application to track cases of covid-19 build using android studio , Java Language and XML language.
+It is an android application that displays the most recent covid data, dashboard displays the most recent statistics of confirmed, death, tests, and recovered cases in India and it updates automatically.
+
+Designed this application using retrofit and restapi.
 
 ## TOOLS USED
 
-* Android Studio
-* Java Language
-* XML Language
+* IDE:- Android Studio
+* LANGUAGE:- Java , XML
 
-## COVID API USED
+## COVID RESTAPI USED
 https://corona.lmao.ninja/v2/countries
 
 
