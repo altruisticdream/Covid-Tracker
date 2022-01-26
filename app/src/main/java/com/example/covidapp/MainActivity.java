@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 fetchdata();
             }
         });
-      //  fetchdata();
+       fetchdata();
 
 
 
