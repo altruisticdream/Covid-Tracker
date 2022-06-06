@@ -1,5 +1,6 @@
 package com.example.covidapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +28,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     @Override
     public Adapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view= LayoutInflater.from(context).inflate(R.layout.layout_item,null,false);
+        @SuppressLint("InflateParams") View view= LayoutInflater.from(context).inflate(R.layout.layout_item,null,false);
         return new ViewHolder(view);
     }
 
@@ -57,7 +58,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         return countryList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView cases,country;
 
 
@@ -67,22 +68,23 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             country=itemView.findViewById(R.id.countryname);
         }
     }
+    @SuppressLint("NotifyDataSetChanged")
     public void filter(String charText)
     {
-        if(charText.equals("cases"))
-        {
-            m=1;
+        switch (charText) {
+            case "cases":
+                m = 1;
+                break;
+            case "recovered":
+                m = 2;
+                break;
+            case "deaths":
+                m = 3;
+                break;
+            default:
+                m = 4;
+                break;
         }
-        else if(charText.equals("recovered"))
-        {
-            m=2;
-        }
-        else if(charText.equals("deaths"))
-        {
-            m=3;
-        }
-        else
-            m=4;
 
         notifyDataSetChanged();
     }

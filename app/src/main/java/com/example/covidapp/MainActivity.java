@@ -1,9 +1,11 @@
 package com.example.covidapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -11,16 +13,23 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.hbb20.CountryCodePicker;
 
 import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
-import org.w3c.dom.Text;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,21 +41,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
   String country;
   TextView mfilter;
   Spinner spinner;
+  private AdView mAdView;
   String[] types={"cases","deaths","recovered","active"};
   private List<ModelClass> modelClasslist;
   private List<ModelClass> modelClasslist2;
   PieChart mpiechart;
-  private RecyclerView recyclerView;
-  com.example.covidapp.Adapter adapter;
+    com.example.covidapp.Adapter adapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
         countryCodePicker=findViewById(R.id.cp);
-        mtodayactive=findViewById(R.id.todayactive);
+        //mtodayactive=findViewById(R.id.todayactive);
         mactive=findViewById(R.id.activecases);
         mdeaths=findViewById(R.id.totaldeath);
         mtodaydeaths=findViewById(R.id.todaydeath);
@@ -57,25 +66,83 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mpiechart=findViewById(R.id.piechart);
         spinner=findViewById(R.id.spinner);
         mfilter=findViewById(R.id.filter);
-        recyclerView=findViewById(R.id.recyclerview);
+        RecyclerView recyclerView;
+        recyclerView = findViewById(R.id.recyclerview);
         modelClasslist=new ArrayList<>();
         modelClasslist2=new ArrayList<>();
         spinner.setOnItemSelectedListener(this);
-        ArrayAdapter arrayAdapter=new ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,types);
+
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+                super.onAdLoaded();
+                Toast.makeText(MainActivity.this,"Welcome",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                super.onAdFailedToLoad(adError);
+                mAdView.loadAd(adRequest );
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+                super.onAdOpened();
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+                super.onAdClicked();
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+        ArrayAdapter<String> arrayAdapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,types);
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinner.setAdapter(arrayAdapter);
 
 
         ApiUtillities.getApitInterface().getCountryData().enqueue(new Callback<List<ModelClass>>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onResponse(Call<List<ModelClass>> call, Response<List<ModelClass>> response) {
+            public void onResponse(@NonNull Call<List<ModelClass>> call, @NonNull Response<List<ModelClass>> response) {
+                assert response.body() != null;
                 modelClasslist2.addAll(response.body());
                 adapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onFailure(Call<List<ModelClass>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<ModelClass>> call, @NonNull Throwable t) {
 
             }
         });
@@ -103,8 +170,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void fetchdata() {
         ApiUtillities.getApitInterface().getCountryData().enqueue(new Callback<List<ModelClass>>() {
             @Override
-            public void onResponse(Call<List<ModelClass>> call, Response<List<ModelClass>> response) {
-                modelClasslist.addAll(response.body());
+            public void onResponse(@NonNull Call<List<ModelClass>> call, @NonNull Response<List<ModelClass>> response) {
+                modelClasslist.addAll(Objects.requireNonNull(response.body()));
                 for(int i=0;i<modelClasslist.size();i++)
                 {
                     if(modelClasslist.get(i).getCountry().equals(country))
@@ -131,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
             @Override
-            public void onFailure(Call<List<ModelClass>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<ModelClass>> call, @NonNull Throwable t) {
 
             }
         });
